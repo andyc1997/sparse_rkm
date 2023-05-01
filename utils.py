@@ -8,15 +8,17 @@ def save_score(ct, N, args, model, cache):
     if not os.path.exists(folder):
         os.makedirs(folder)
 
+    seed = args.path.split('-')[-1].split('.')[0]
+
     if model == 'fwSprs_dpca' or model == 'fwSprs_kpca':
-        filename = folder + '/{card}/{dataset}-{ct}-{model}-{h_dim}'.format(card=str(int(args.rho*1000)), dataset=args.dataset, ct=ct, model=model, h_dim=args.h_dim)
+        filename = folder + '/{card}/{dataset}-{ct}-{model}-{h_dim}-seed-{seed}'.format(card=str(int(args.rho*1000)), dataset=args.dataset, ct=ct, model=model, h_dim=args.h_dim, seed=seed)
     elif model == 'iwSprs_kpca' or model == 'iwSprs_dpca':
-        filename = folder + '/{card}/{dataset}-{ct}-{model}-{h_dim}'.format(card=str(int(args.c_sprs*1000)), dataset=args.dataset, ct=ct, model=model, h_dim=args.h_dim)
+        filename = folder + '/{card}/{dataset}-{ct}-{model}-{h_dim}-seed-{seed}'.format(card=str(int(args.c_sprs*1000)), dataset=args.dataset, ct=ct, model=model, h_dim=args.h_dim, seed=seed)
     elif model == 'sdrkm':
         norm_direc = {0: '11norm', 1: '12norm', 2: '01norm', 3: '02norm'}
-        filename = folder + '/{norm}/{dataset}-{ct}-{model}-s1-{h_dim1}-s2-{h_dim2}'.format(norm=norm_direc[args.norm], dataset=args.dataset, ct=ct, model=model, h_dim1=args.h_dim[0], h_dim2=args.h_dim[1])
+        filename = folder + '/{norm}/{dataset}-{ct}-{model}-s1-{h_dim1}-s2-{h_dim2}-seed-{seed}'.format(norm=norm_direc[args.norm], dataset=args.dataset, ct=ct, model=model, h_dim1=args.h_dim[0], h_dim2=args.h_dim[1], seed=seed)
     else:
-        filename = folder + '/{dataset}-{ct}-{model}-{h_dim}'.format(dataset=args.dataset, ct=ct, model=model, h_dim=args.h_dim)
+        filename = folder + '/{dataset}-{ct}-{model}-{h_dim}-seed-{seed}'.format(dataset=args.dataset, ct=ct, model=model, h_dim=args.h_dim, seed=seed)
 
     with open(filename + '.pkl', 'wb') as f:
         pickle.dump(cache, f)

@@ -19,6 +19,10 @@ logging.basicConfig(level=logging.DEBUG,
                     handlers=handlers)
 
 
+# disable numba logger, too many messages
+logging.getLogger('numba').setLevel(logging.WARNING)
+
+
 # parser
 parser = parser_fwsprs_kpca()
 args = parser.parse_args()
@@ -28,7 +32,8 @@ logging.info(args.__str__())
 # load data
 ct = time.strftime('%Y%m%d-%H%M')
 data = np.load(args.path, allow_pickle=True)
-N, p = data.shape
+N = data.shape[0]
+p = data.reshape(N, -1).shape[1]
 checkargs_fwsprs_kpca(args, data, N)
 
 
@@ -54,7 +59,7 @@ def kpca(X, N):
     return U
 
 
-score, svdvals = kpca(data.reshape(N, -1), N)
+score = kpca(data.reshape(N, -1), N)
 cache = {'score': score, 'args': args.__str__()}
 save_score(ct, N, args, 'fwSprs_kpca', cache)
 logging.info('Computation finished.')

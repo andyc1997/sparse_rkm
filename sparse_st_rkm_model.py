@@ -4,6 +4,7 @@ import time
 import torch
 import logging
 import sys
+from cayley_adam import stiefel_optimizer
 
 import net_dsprites
 import net_norb
@@ -85,31 +86,34 @@ else:
     logging.error('unsupported dataset!')
 
 
+# loading matrix
+def st_init(N, s):
+    h_init, _ = torch.linalg.qr(torch.randn(size=(N, s)))
+    return h_init.t()
+U_init = st_init(args.p_feat, args.h_dim)
+U = torch.nn.Parameter(U_init.to(device), requires_grad=True)
+
+
 # Adam optimizer
 params = list(encoder.parameters()) + list(decoder.parameters())
 optimizer = optim.Adam(params, lr=args.lr, weight_decay=0)
+params_pca = [{'params': [U], 'lr': args.lr_pca, 'stiefel': True}]
+st_optimizer = stiefel_optimizer.AdamG(params_pca)
 
 
-# Centering + kPCA
-def kPCA(X):
-    K = torch.mm(X, torch.t(X))
-    N, _ = K.shape
-    oneN = torch.div(torch.ones(N, N), N).float().to(device)
-    K = K - torch.mm(oneN, K) - torch.mm(K, oneN) + torch.mm(torch.mm(oneN, K), oneN)
-
-    # do svd
-    h, s, _ = torch.svd(K, some=False)
-
-    # select components
-    h = h[:, :args.h_dim]
-    s = s[:args.h_dim]
-    return h, s
+# Centering + Covariance
+def centering(X):
+    n, _ = X.shape
+    C = torch.eye(n).to(device) - torch.ones(n, n).to(device)/n
+    Xc = torch.mm(C, X)
+    Cov = torch.mm(Xc.t(), Xc)
+    return Xc, Cov
 
 
 # RKM Loss
 def rkm_loss(phi, X):
     # get preimage
-    h, s = kPCA(phi)
+    phic, cov = centering(phi)
     W = torch.mm(phi.t(), h)
     Phi_hat = torch.mm(h, W.t())
     x_tilde = decoder(Phi_hat)

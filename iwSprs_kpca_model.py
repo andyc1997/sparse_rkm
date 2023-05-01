@@ -32,7 +32,8 @@ logging.info(args.__str__())
 # load data
 ct = time.strftime('%Y%m%d-%H%M')
 data = np.load(args.path, allow_pickle=True)
-N, p = data.shape
+N = data.shape[0]
+p = data.reshape(N, -1).shape[1]
 li_loss = []
 checkargs_iwsprs_kpca(args, data, N)
 

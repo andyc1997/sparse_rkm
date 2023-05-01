@@ -11,6 +11,14 @@ def checkargs_kpca(args, data, N):
     assert data.max().astype(int) <= 1, f'data should be normalized to [0, 1].'
 
 
+def checkargs_tune_kpca(args, data, N):
+    assert args.h_dim > 0, f'h_dim should be positive, but found {args.h_dim}.'
+    assert args.h_dim < N, f'h_dim should be less than the sample size, but found {args.h_dim}.'
+    assert (args.start_sig2 > 0) and (args.stop_sig2 > 0) and (args.start_sig2 < args.stop_sig2), f'Invalid ranges for start_sig2 and stop_sig2.'
+    assert args.num > 1, f'Invalid number of grid points {args.num}.'
+    assert data.max().astype(int) <= 1, f'data should be normalized to [0, 1].'
+
+
 def checkargs_fwsprs_kpca(args, data, N):
     checkargs_kpca(args, data, N)
     assert args.rho > 0, f'rho should be positive, but found {args.rho}.'

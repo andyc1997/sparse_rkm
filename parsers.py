@@ -18,6 +18,17 @@ def parser_kpca():
     return parser
 
 
+def parser_tune_kpca():
+    parser = argparse.ArgumentParser(prog='model:kPCA', description='Tune kernel PCA. The bandwidth parameter should be provided.')
+    parser.add_argument('path', type=str, help='Path to the dataset.')
+    parser.add_argument('--dataset', type=str, help='Name for the dataset.')
+    parser.add_argument('--h_dim', type=int, help='Latent dimension.')
+    parser.add_argument('--start_sig2', type=float, help='Starting point of sig2.')
+    parser.add_argument('--stop_sig2', type=float, help='End point of sig2.')
+    parser.add_argument('--num', type=int, help='The number of grid points.')
+    return parser
+
+
 def parser_fwsprs_kpca():
     parser = argparse.ArgumentParser(prog='model:fwSprskPCA', description='Train featurewise sparse kernel PCA. The bandwidth and sparsity parameters should be provided.')
     parser.add_argument('path', type=str, help='Path to the dataset.')
@@ -100,7 +111,8 @@ def parser_sdrkm():
 
 def parser_gen_rkm(model='GenRKM'):
     parser = argparse.ArgumentParser(prog='model:{model}'.format(model=model), description='Train {model} model.'.format(model=model))
-    parser.add_argument('path_dataset', type=str, help='The path to the dataset.', metavar='')
+    parser.add_argument('path', type=str, help='The path to the dataset.', metavar='')
+    parser.add_argument('--dataset', type=str, help='Name for the dataset.')
     parser.add_argument('--c_accu', type=float, default=100, help='The parameter for accuracy of reconstruction error.', metavar='')
     parser.add_argument('--c_stab', type=float, default=1, help='The parameter for stability of RKM energy function.', metavar='')
     parser.add_argument('--p_feat', type=int, default=256, help='The dimension for feature space.', metavar='')
